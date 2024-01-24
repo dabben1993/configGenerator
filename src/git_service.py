@@ -1,4 +1,6 @@
 import os
+import requests
+
 from git import Repo
 from git.exc import GitCommandError
 
@@ -56,13 +58,47 @@ class GitService:
         except GitCommandError as e:
             print(f"Error creating or pushing changes to the new branch: {e}")
 
-    def create_pull_request(self, title, description):
-        try:
-            # Create a pull request
-            pull_request_url = f'{self.repo_url}/pull-requests/new?source={self.new_branch_name}&title={title}&description={description}'
-            print(f"Pull request created. Open the following link to review and merge:\n{pull_request_url}")
-        except GitCommandError as e:
-            print(f"Error creating pull request: {e}")
+    def create_pull_request(bitbucket_url, username, password, repository, source_branch, destination_branch, title,
+                            description):
+        api_url = f"{bitbucket_url}/rest/api/1.0/projects/{username}/repos/{repository}/pull-requests"
+
+        # Create a pull request payload
+        payload = {
+            "title": title,
+            "description": description,
+            "state": "OPEN",
+            "open": True,
+            "closed": False,
+            "fromRef": {
+                "id": f"refs/heads/{source_branch}",
+                "repository": {
+                    "slug": repository,
+                    "name": None,
+                    "project": {
+                        "key": username
+                    }
+                }
+            },
+            "toRef": {
+                "id": f"refs/heads/{destination_branch}",
+                "repository": {
+                    "slug": repository,
+                    "name": None,
+                    "project": {
+                        "key": username
+                    }
+                }
+            }
+        }
+
+        # Perform the HTTP request to create a pull request
+        response = requests.post(api_url, json=payload, auth=(username, password))
+
+        if response.status_code == 201:
+            print("Pull request created successfully.")
+        else:
+            print(f"Failed to create pull request. Status code: {response.status_code}")
+            print(response.text)
 
 # Example usage:
 # git_service = GitService(repo_url='https://bitbucket.org/your_username/your_repository.git',
