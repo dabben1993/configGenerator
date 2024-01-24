@@ -1,5 +1,9 @@
+import json
+import os
+
 import cerberus
 import yaml
+
 
 class ConfigValidator:
     def __init__(self):
@@ -21,3 +25,20 @@ class ConfigValidator:
             print("Invalid configuration:")
             for error in self.validator.errors:
                 print(f"  - {error}: {self.validator.errors[error]}")
+
+    def convert_to_json(self, file_path, json_output_path=None):
+        with open(file_path, 'r') as config_file:
+            config_data = yaml.safe_load(config_file)
+
+        json_output = json.dumps(config_data, indent=2)
+
+        if json_output_path:
+            output_directory = os.path.dirname(json_output_path)
+            os.makedirs(output_directory, exist_ok=True)  # Create the directory if it doesn't exist
+
+            with open(json_output_path, 'w') as json_output_file:
+                json_output_file.write(json_output)
+            print(f"JSON object written to {json_output_path}")
+        else:
+            print("JSON object:")
+            print(json_output)
