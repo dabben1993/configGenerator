@@ -3,7 +3,7 @@ import configparser
 
 def set_aws_credentials():
     config = configparser.ConfigParser()
-    config.read('config/config.ini')  # Adjust the path if the config file is in a different location
+    config.read('../config/config.ini')  # Adjust the path if the config file is in a different location
 
     # Set your AWS credentials
     os.environ["AWS_ACCESS_KEY_ID"] = config.get('aws_credentials', 'AWS_ACCESS_KEY_ID')
