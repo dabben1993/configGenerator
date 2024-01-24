@@ -4,7 +4,8 @@ from git.exc import GitCommandError
 
 
 class GitService:
-    def __init__(self, repo_url, branch, destination):
+    def __init__(self, repo_url, branch, destination, new_branch_name):
+        self.new_branch_name = new_branch_name
         self.repo_url = repo_url
         self.branch = branch
         self.repo_name = None
@@ -32,31 +33,36 @@ class GitService:
             print("Repository cloned successfully.")
         return repo
 
-    def commit_and_push(self, commit_message):
+    def create_and_push_to_new_branch(self, commit_message):
         try:
+            # Create and switch to a new branch
+            self.repo.git.checkout(b=self.new_branch_name)
+            print(f"New branch '{self.new_branch_name}' created and checked out.")
+
+            # Make changes to the repository (add your logic here)
+
             # Add all changes
             self.repo.git.add("--all")
 
             # Commit changes
             self.repo.index.commit(commit_message)
+            print(f"Changes committed with message: '{commit_message}'.")
 
-            # Push to the remote repository
+            # Push the new branch to the remote repository
             origin = self.repo.remote(name='origin')
-            origin.push(refspec=f'{self.branch}:{self.branch}')
-            print("Changes committed and pushed successfully.")
+            origin.push(refspec=f'{self.new_branch_name}:{self.new_branch_name}')
+            print(f"Changes pushed to the remote branch '{self.new_branch_name}'.")
+
         except GitCommandError as e:
-            print(f"Error committing and pushing changes: {e}")
+            print(f"Error creating or pushing changes to the new branch: {e}")
 
     def create_pull_request(self, title, description):
         try:
             # Create a pull request
-            origin = self.repo.remote(name='origin')
-            origin.push(refspec=f'{self.branch}:{self.branch}')
-            pull_request_url = f'{self.repo_url}/pull-requests/new?source={self.branch}&title={title}&description={description}'
+            pull_request_url = f'{self.repo_url}/pull-requests/new?source={self.new_branch_name}&title={title}&description={description}'
             print(f"Pull request created. Open the following link to review and merge:\n{pull_request_url}")
         except GitCommandError as e:
             print(f"Error creating pull request: {e}")
-
 
 # Example usage:
 # git_service = GitService(repo_url='https://bitbucket.org/your_username/your_repository.git',

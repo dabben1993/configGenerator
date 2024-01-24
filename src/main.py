@@ -22,7 +22,8 @@ print("secret key: " + aws_secret_access_key)
 git_service = GitService(
     repo_url="https://dabben93@bitbucket.org/config-generator/test.git",
     branch="main",
-    destination="../repos/"
+    destination="../repos/",
+    new_branch_name="newTest"
 )
 
 
@@ -36,7 +37,7 @@ s3_transfer = S3Transfer(bucket_name='timpabucket', aws_access_key_id=aws_access
                          aws_secret_access_key=aws_secret_access_key, region_name="us-east-2")
 s3_transfer.upload_file(local_file_path=git_service.destination + "/output/test.json", s3_object_key="output/test.json")
 
-git_service.commit_and_push(commit_message="This is a commit")
+git_service.create_and_push_to_new_branch(commit_message="This is a commit")
 git_service.create_pull_request(title="Generic title", description="Lorem ipsum")
 
 
