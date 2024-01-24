@@ -9,66 +9,54 @@ class GitService:
         self.branch = branch
         self.repo_name = None
         self.destination = destination
+        self.repo = self._clone_repo()
 
-    def clone_repository(self):
+    def _clone_repo(self):
+
         # Extract the repository name from the URL
         repo_name = self.repo_url.split('/')[-1].split('.')[0]
 
         # Set the destination folder to the custom path with the repository name appended
         self.destination = os.path.join(self.destination, repo_name)
 
+        # Check if the repository already exists in the specified destination
+        if os.path.exists(self.destination):
+            repo = Repo(self.destination)
+            print("Repository already exists. Updating...")
+            # Pull latest changes from the remote repository
+            origin = repo.remote(name='origin')
+            origin.pull()
+        else:
+            # Clone the repository if it doesn't exist
+            repo = Repo.clone_from(self.repo_url, self.destination, branch=self.branch)
+            print("Repository cloned successfully.")
+        return repo
+
+    def commit_and_push(self, commit_message):
         try:
-            # Clone the repository to the specified destination
-            Repo.clone_from(self.repo_url, self.destination, branch=self.branch)
-            print(f"Repository cloned successfully to {self.destination}")
+            # Add all changes
+            self.repo.git.add("--all")
+
+            # Commit changes
+            self.repo.index.commit(commit_message)
+
+            # Push to the remote repository
+            origin = self.repo.remote(name='origin')
+            origin.push(refspec=f'{self.branch}:{self.branch}')
+            print("Changes committed and pushed successfully.")
         except GitCommandError as e:
-            print(f"Error cloning repository: {e}")
+            print(f"Error committing and pushing changes: {e}")
 
     def create_pull_request(self, title, description):
         try:
-            # Open the cloned repository
-            repo = Repo(self.destination)
-
-            # Create a new branch for changes
-            branch_name = f"feature/{title.replace(' ', '_')}"
-            repo.create_head(branch_name).checkout()
-
-            # Commit changes (you would replace this with your actual logic)
-            # For demonstration purposes, we'll just create an empty file
-            with open(os.path.join(self.destination, 'example.txt'), 'w') as f:
-                f.write('This is a placeholder file.')
-
-            repo.index.add(['example.txt'])
-            repo.index.commit(f"Add feature: {title}")
-
-            # Push the changes to the new branch
-            repo.git.push('--set-upstream', 'origin', branch_name)
-
             # Create a pull request
-            pull_request = repo.create_pull(
-                title=title,
-                body=description,
-                base='main',  # Replace with your target branch
-                head=branch_name
-            )
-
-            print(f"Pull request created successfully: {pull_request.html_url}")
-
+            origin = self.repo.remote(name='origin')
+            origin.push(refspec=f'{self.branch}:{self.branch}')
+            pull_request_url = f'{self.repo_url}/pull-requests/new?source={self.branch}&title={title}&description={description}'
+            print(f"Pull request created. Open the following link to review and merge:\n{pull_request_url}")
         except GitCommandError as e:
             print(f"Error creating pull request: {e}")
 
-    def push_changes(self):
-        try:
-            # Open the cloned repository
-            repo = Repo(self.destination)
-
-            # Push changes to the remote repository
-            repo.remotes.origin.push()
-
-            print("Changes pushed successfully.")
-
-        except GitCommandError as e:
-            print(f"Error pushing changes: {e}")
 
 # Example usage:
 # git_service = GitService(repo_url='https://bitbucket.org/your_username/your_repository.git',
