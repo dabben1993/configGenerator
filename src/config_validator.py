@@ -4,15 +4,27 @@ import os
 import cerberus
 import yaml
 
+class AppConfig:
+    def __init__(self, database=None, logging=None):
+        self.database = database or {}
+        self.logging = logging or {}
+
+    def to_json(self):
+        return json.dumps(self.__dict__, indent=2)
+
+    def __repr__(self):
+        return f"AppConfig(database={self.database}, logging={self.logging})"
+
 
 class ConfigValidator:
-    def __init__(self, schema_path, file_path, json_output_path=None):
+    def __init__(self, schema_path, file_path, json_output_path=None, destination=None):
         self.schema_path = schema_path
         file_path = file_path
         json_output_path = json_output_path
+        destination = destination
         self.validator = self._load_schema()
 
-        self._validate_yml(file_path)
+        self._validate_yml(file_path, destination)
         self._convert_to_json(file_path, json_output_path)
 
     def _load_schema(self):
@@ -20,12 +32,21 @@ class ConfigValidator:
             schema = yaml.safe_load(schema_file)
             return cerberus.Validator(schema)
 
-    def _validate_yml(self, file_path):
+    def _validate_yml(self, file_path, destination):
         with open(file_path, 'r') as config_file:
             config_data = yaml.safe_load(config_file)
 
         if self.validator.validate(config_data):
             print("Configuration is valid.")
+            app_config = AppConfig(**config_data.get('config', {}))
+            print("AppConfig object:", app_config)
+
+            # Save AppConfig as JSON
+            json_output_path = os.path.join(destination, "app_config.json")
+            os.makedirs(destination, exist_ok=True)
+            with open(json_output_path, 'w') as json_output_file:
+                json_output_file.write(app_config.to_json())
+            print(f"AppConfig object written to {json_output_path}")
         else:
             print("Invalid configuration:")
             for error in self.validator.errors:

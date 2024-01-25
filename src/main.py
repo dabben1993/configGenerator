@@ -31,6 +31,7 @@ git_service = GitService(
 # Validate yml file and convert to JSON
 validator = ConfigValidator(file_path=git_service.destination + "/yml/test.yml",
                             json_output_path=git_service.destination + "/output/test.json",
+                            destination=git_service.destination + "/output/",
                             schema_path="../config/cerberus_schema.yml")
 # print(git_service.destination)
 # TODO: make the method inside validator
