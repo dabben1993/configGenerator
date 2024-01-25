@@ -1,30 +1,45 @@
-from atlassian import Bitbucket
+from atlassian.bitbucket import Bitbucket
+from atlassian.bitbucket import HTTPError
 
-class BitbucketPullRequest:
-    def __init__(self, username, password, base_url="https://bitbucket.org/"):
-        self.username = username
-        self.password = password
-        self.base_url = base_url
-        self.bitbucket = Bitbucket(
-            url=self.base_url,
-            username=self.username,
-            password=self.password,
-            timeout=60,
-        )
 
-    def create_pull_request(
-        self,
-        project_key,
-        repository_slug,
-        data,
-    ):
+class BitbucketPullRequestHandler:
+    def __init__(self, username, app_password):
+        self.bb = Bitbucket(url='https://api.bitbucket.org', username=username, password=app_password)
+
+    def open_pull_request(self, project_key, repository_slug, source_branch, destination_branch, title, description):
+        """
+        Create a pull request on Bitbucket.
+
+        :param project_key: Bitbucket project key.
+        :param repository_slug: Bitbucket repository slug.
+        :param source_branch: Source branch for the pull request.
+        :param destination_branch: Destination branch for the pull request.
+        :param title: Title of the pull request.
+        :param description: Description of the pull request.
+        :return: Response of the API call.
+        """
         try:
-            url = self._url_pull_requests(project_key, repository_slug)
-            response = self.bitbucket.post(url, data=data)
-            pull_request_url = response.get("links", {}).get("self", [{}])[0].get("href")
-            print(f"Pull request created successfully. URL: {pull_request_url}")
-        except Exception as e:
-            print(f"Error creating pull request: {e}")
+            response = self.bb.open_pull_request(source_project=project_key, source_repo=repository_slug,
+                                                 dest_project=project_key, dest_repo=repository_slug,
+                                                 source_branch=source_branch, destination_branch=destination_branch,
+                                                 title=title, description=description)
+            return response
+        except HTTPError as e:
+            print(f"Error creating pull request: {e.response.content}")
+            raise
 
-    def _url_pull_requests(self, project_key, repository_slug):
-        return f"/rest/api/1.0/projects/{project_key}/repos/{repository_slug}/pull-requests"
+    def create_pull_request(self, project_key, repository_slug, pull_request_id):
+        """
+        Open an existing pull request on Bitbucket.
+
+        :param project_key: Bitbucket project key.
+        :param repository_slug: Bitbucket repository slug.
+        :param pull_request_id: ID of the pull request to open.
+        :return: Response of the API call.
+        """
+        try:
+            response = self.bb.create_pull_request(project_key, repository_slug, pull_request_id)
+            return response
+        except HTTPError as e:
+            print(f"Error opening pull request: {e.response.content}")
+            raise

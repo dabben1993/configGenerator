@@ -41,12 +41,12 @@ git_service.create_and_push_to_new_branch(commit_message="This is a commit")
 bitbucket_pull_request = BitbucketPullRequestHandler(username=secrets.bitbucket_username,
                                                      app_password=secrets.bitbucket_app_password)
 
-bitbucket_pull_request.open_pull_request(project_key="config-generator",
-                                                    repository_slug="test",
-                                                    source_branch="newTest",
-                                                    destination_branch="main",
-                                                    title="Generic Title",
-                                                    description="Lorem ipsum")
+bitbucket_pull_request.open_pull_request(project_key="test1",
+                                         repository_slug="test",
+                                         source_branch="newTest",
+                                         destination_branch="main",
+                                         title="Generic Title",
+                                         description="Lorem ipsum")
 
 # git_service.create_pull_request(source_branch=git_service.new_branch_name,
 #                                destination_branch=git_service.branch,

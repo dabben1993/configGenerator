@@ -3,6 +3,7 @@ import os
 
 import cerberus
 import yaml
+from logger import logger
 
 
 class AppConfig:
@@ -23,37 +24,37 @@ class ConfigValidator:
         file_path = file_path
         json_output_path = json_output_path
         destination = destination
-        self.validator = self._load_schema()
+        self.validator = self.load_schema()
 
-        self._validate_yml(file_path, destination)
-        self._convert_to_json(file_path, json_output_path)
+        self.validate_yml(file_path, destination)
+        self.convert_to_json(file_path, json_output_path)
 
-    def _load_schema(self):
+    def load_schema(self):
         with open(self.schema_path, 'r') as schema_file:
             schema = yaml.safe_load(schema_file)
             return cerberus.Validator(schema)
 
-    def _validate_yml(self, file_path, destination):
+    def validate_yml(self, file_path, destination):
         with open(file_path, 'r') as config_file:
             config_data = yaml.safe_load(config_file)
 
         if self.validator.validate(config_data):
-            print("Configuration is valid.")
+            logger.info("Configuration is valid")
             app_config = AppConfig(**config_data.get('config', {}))
-            print("AppConfig object:", app_config)
+            logger.info("AppConfig object:", app_config)
 
             # Save AppConfig as JSON
             json_output_path = os.path.join(destination, "app_config.json")
             os.makedirs(destination, exist_ok=True)
             with open(json_output_path, 'w') as json_output_file:
                 json_output_file.write(app_config.to_json())
-            print(f"AppConfig object written to {json_output_path}")
+            logger.info(f"AppConfig object written to {json_output_path}")
         else:
-            print("Invalid configuration:")
+            logger.info("Invalid configuration:")
             for error in self.validator.errors:
-                print(f"  - {error}: {self.validator.errors[error]}")
+                logger.error(f"  - {error}: {self.validator.errors[error]}")
 
-    def _convert_to_json(self, file_path, json_output_path=None):
+    def convert_to_json(self, file_path, json_output_path=None):
         with open(file_path, 'r') as config_file:
             config_data = yaml.safe_load(config_file)
 
@@ -65,7 +66,7 @@ class ConfigValidator:
 
             with open(json_output_path, 'w') as json_output_file:
                 json_output_file.write(json_output)
-            print(f"JSON object written to {json_output_path}")
+            logger.info(f"JSON object written to {json_output_path}")
         else:
-            print("JSON object:")
-            print(json_output)
+            logger.info("JSON object:")
+            logger.info(json_output)
