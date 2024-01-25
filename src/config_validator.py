@@ -4,6 +4,7 @@ import os
 import cerberus
 import yaml
 
+
 class AppConfig:
     def __init__(self, database=None, logging=None):
         self.database = database or {}

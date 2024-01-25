@@ -40,8 +40,9 @@ validator = ConfigValidator(file_path=git_service.destination + "/yml/test.yml",
 #                          json_output_path=git_service.destination + "/output/test.json")
 
 # Upload it to s3 Bucket
-#s3_transfer = S3Transfer(bucket_name='timpabucket', aws_access_key_id=aws_access_key_id,
-#                         aws_secret_access_key=aws_secret_access_key, region_name="us-east-2")
+s3_transfer = S3Transfer(bucket_name='timpabucket', aws_access_key_id=aws_access_key_id,
+                         aws_secret_access_key=aws_secret_access_key, region_name="us-east-2",
+                         local_folder_path=git_service.destination + "/output/")
 #s3_transfer.upload_file(local_file_path=git_service.destination + "/output/test.json", s3_object_key="output/test.json")
 
 # Commit, push and pull request
