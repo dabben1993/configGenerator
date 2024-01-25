@@ -1,4 +1,7 @@
+import base64
 import os
+from base64 import b64encode
+
 import requests
 
 from git import Repo
@@ -6,7 +9,7 @@ from git.exc import GitCommandError
 
 
 class GitService:
-    def __init__(self, repo_url, branch, destination, new_branch_name):
+    def __init__(self, repo_url, branch, destination, new_branch_name=None):
         self.new_branch_name = new_branch_name
         self.repo_url = repo_url
         self.branch = branch
@@ -41,8 +44,6 @@ class GitService:
             self.repo.git.checkout(b=self.new_branch_name)
             print(f"New branch '{self.new_branch_name}' created and checked out.")
 
-            # Make changes to the repository (add your logic here)
-
             # Add all changes
             self.repo.git.add("--all")
 
@@ -58,52 +59,39 @@ class GitService:
         except GitCommandError as e:
             print(f"Error creating or pushing changes to the new branch: {e}")
 
-    def create_pull_request(bitbucket_url, username, password, repository, source_branch, destination_branch, title,
-                            description):
-        api_url = f"{bitbucket_url}/rest/api/1.0/projects/{username}/repos/{repository}/pull-requests"
+    def create_pull_request(self, source_branch, destination_branch, title, description):
 
-        # Create a pull request payload
+        # Bitbucket REST API endpoint for creating a pull request
+        api_url = "https://api.bitbucket.org/2.0/repositories/config-generator/test/pullrequests"
+
+        print(api_url)
+
+        # Prepare the payload for the API request
         payload = {
             "title": title,
             "description": description,
-            "state": "OPEN",
-            "open": True,
-            "closed": False,
-            "fromRef": {
-                "id": f"refs/heads/{source_branch}",
-                "repository": {
-                    "slug": repository,
-                    "name": None,
-                    "project": {
-                        "key": username
-                    }
-                }
+            "source": {
+                "branch": {"name": source_branch}
             },
-            "toRef": {
-                "id": f"refs/heads/{destination_branch}",
-                "repository": {
-                    "slug": repository,
-                    "name": None,
-                    "project": {
-                        "key": username
-                    }
-                }
+            "destination": {
+                "branch": {"name": destination_branch}
             }
         }
 
-        # Perform the HTTP request to create a pull request
-        response = requests.post(api_url, json=payload, auth=(username, password))
+        # Set authentication headers using the app password
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Basic {base64.b64encode(f'{os.getenv("BITBUCKET_USERNAME")}:{os.getenv("BITBUCKET_APP_PASSWORD")}'.encode()).decode()}",
+        }
 
+        print("Authentication Header:", headers)
+        print("Payload:", payload)
+
+        # Make the API request
+        response = requests.request("POST", api_url, data=payload, headers=headers)
+
+        # Check the response status
         if response.status_code == 201:
             print("Pull request created successfully.")
         else:
-            print(f"Failed to create pull request. Status code: {response.status_code}")
-            print(response.text)
-
-# Example usage:
-# git_service = GitService(repo_url='https://bitbucket.org/your_username/your_repository.git',
-#                          branch='main',
-#                          destination='path/to/clone')
-# git_service.clone_repository()
-# git_service.create_pull_request(title='Example Feature', description='This is an example feature.')
-# git_service.push_changes()
+            print(f"Failed to create pull request. Status code: {response.status_code}, Error: {response.text}")

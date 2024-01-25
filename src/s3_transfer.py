@@ -38,6 +38,4 @@ class S3Transfer:
         except (NoCredentialsError, PartialCredentialsError):
             print("AWS credentials not available. Make sure you have configured your credentials.")
 
-# Example usage:
-# s3_transfer = S3Transfer(bucket_name='your-s3-bucket', aws_access_key_id='your-access-key', aws_secret_access_key='your-secret-key', region_name='your-region')
-# s3_transfer.upload_file(local_file_path='output/test.json', s3_object_key='output/test.json')
+

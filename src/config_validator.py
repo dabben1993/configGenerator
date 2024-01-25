@@ -6,16 +6,21 @@ import yaml
 
 
 class ConfigValidator:
-    def __init__(self):
-        self.schema_path = "../config/cerberus_schema.yml"
+    def __init__(self, schema_path, file_path, json_output_path=None):
+        self.schema_path = schema_path
+        file_path = file_path
+        json_output_path = json_output_path
         self.validator = self._load_schema()
+
+        self._validate_yml(file_path)
+        self._convert_to_json(file_path, json_output_path)
 
     def _load_schema(self):
         with open(self.schema_path, 'r') as schema_file:
             schema = yaml.safe_load(schema_file)
             return cerberus.Validator(schema)
 
-    def validate_yml(self, file_path):
+    def _validate_yml(self, file_path):
         with open(file_path, 'r') as config_file:
             config_data = yaml.safe_load(config_file)
 
@@ -26,7 +31,7 @@ class ConfigValidator:
             for error in self.validator.errors:
                 print(f"  - {error}: {self.validator.errors[error]}")
 
-    def convert_to_json(self, file_path, json_output_path=None):
+    def _convert_to_json(self, file_path, json_output_path=None):
         with open(file_path, 'r') as config_file:
             config_data = yaml.safe_load(config_file)
 
