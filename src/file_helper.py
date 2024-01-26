@@ -1,6 +1,9 @@
 import json
 import os
 import yaml
+import structlog
+
+log = structlog.get_logger()
 
 
 class FileHandler:
@@ -9,14 +12,15 @@ class FileHandler:
         self.destination_directory = destination_directory
 
     def read_yaml(self, file_name):
-        print(file_name)
-        file_path = os.path.join(file_name)
-        print(file_path)
-        with open(file_path, 'r') as file:
+        with open(file_name, 'r') as file:
+            log.info("File opened", file=file_name + " opened")
             return yaml.safe_load(file)
 
     def convert_to_json(self, data):
-        return data.to_json() if hasattr(data, 'to_json') else json.dumps(data, indent=2)
+        log.info("File to be converted", org_file=data)
+        json_data = data.to_json()
+        log.info("File converted to json", json_output=json_data)
+        return json_data
 
     def save_as_json(self, data, output_directory, file_name):
         json_output_path = os.path.join(output_directory, file_name + ".json")
@@ -25,4 +29,4 @@ class FileHandler:
         with open(json_output_path, 'w') as json_output_file:
             json_output_file.write(data)
 
-        print(f"JSON object written to {json_output_path}")
+        log.info("JSON object created", path=json_output_path)
