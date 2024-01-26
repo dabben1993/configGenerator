@@ -6,7 +6,7 @@ import requests
 
 from git import Repo
 from git.exc import GitCommandError
-from logger import logger
+
 
 
 class GitService:
@@ -29,33 +29,33 @@ class GitService:
         # Check if the repository already exists in the specified destination
         if os.path.exists(self.destination):
             repo = Repo(self.destination)
-            logger.info("Repository already exists. Updating...")
+            print("Repository already exists. Updating...")
             # Pull latest changes from the remote repository
             origin = repo.remote(name='origin')
             origin.pull()
         else:
             # Clone the repository if it doesn't exist
             repo = Repo.clone_from(self.repo_url, self.destination, branch=self.branch)
-            logger.info("Repository cloned successfully.")
+            print("Repository cloned successfully.")
         return repo
 
     def create_and_push_to_new_branch(self, commit_message):
         try:
             # Create and switch to a new branch
             self.repo.git.checkout(b=self.new_branch_name)
-            logger.info(f"New branch '{self.new_branch_name}' created and checked out.")
+            print(f"New branch '{self.new_branch_name}' created and checked out.")
 
             # Add all changes
             self.repo.git.add("--all")
 
             # Commit changes
             self.repo.index.commit(commit_message)
-            logger.info(f"Changes committed with message: '{commit_message}'.")
+            print(f"Changes committed with message: '{commit_message}'.")
 
             # Push the new branch to the remote repository
             origin = self.repo.remote(name='origin')
             origin.push(refspec=f'{self.new_branch_name}:{self.new_branch_name}')
-            logger.info(f"Changes pushed to the remote branch '{self.new_branch_name}'.")
+            print(f"Changes pushed to the remote branch '{self.new_branch_name}'.")
 
         except GitCommandError as e:
-            logger.error(f"Error creating or pushing changes to the new branch: {e}")
+            print(f"Error creating or pushing changes to the new branch: {e}")

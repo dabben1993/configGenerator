@@ -8,8 +8,8 @@ class TestConfigValidator(unittest.TestCase):
 
     def setUp(self):
         self.validator = ConfigValidator(schema_path="../config/cerberus_schema.yml",
-                                         file_path="../tests/test.yml",
-                                         json_output_path="../tests/output/",
+                                         file_path="test.yml",
+                                         json_output_path="output/",
                                          destination="../tests/output/")
 
 

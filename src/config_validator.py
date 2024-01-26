@@ -3,8 +3,6 @@ import os
 
 import cerberus
 import yaml
-from logger import logger
-
 
 class AppConfig:
     def __init__(self, database=None, logging=None):
@@ -39,20 +37,20 @@ class ConfigValidator:
             config_data = yaml.safe_load(config_file)
 
         if self.validator.validate(config_data):
-            logger.info("Configuration is valid")
+            print("Configuration is valid")
             app_config = AppConfig(**config_data.get('config', {}))
-            logger.info("AppConfig object:", app_config)
+            print("AppConfig object:", app_config)
 
             # Save AppConfig as JSON
             json_output_path = os.path.join(destination, "app_config.json")
             os.makedirs(destination, exist_ok=True)
             with open(json_output_path, 'w') as json_output_file:
                 json_output_file.write(app_config.to_json())
-            logger.info(f"AppConfig object written to {json_output_path}")
+            print(f"AppConfig object written to {json_output_path}")
         else:
-            logger.info("Invalid configuration:")
+            print("Invalid configuration:")
             for error in self.validator.errors:
-                logger.error(f"  - {error}: {self.validator.errors[error]}")
+                print(f"  - {error}: {self.validator.errors[error]}")
 
     def convert_to_json(self, file_path, json_output_path=None):
         with open(file_path, 'r') as config_file:
@@ -66,7 +64,7 @@ class ConfigValidator:
 
             with open(json_output_path, 'w') as json_output_file:
                 json_output_file.write(json_output)
-            logger.info(f"JSON object written to {json_output_path}")
+            print(f"JSON object written to {json_output_path}")
         else:
-            logger.info("JSON object:")
-            logger.info(json_output)
+            print("JSON object:")
+            print(json_output)

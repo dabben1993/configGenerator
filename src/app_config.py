@@ -1,13 +1,16 @@
 import configparser
 import os
+from dotenv import load_dotenv
 
 
 class AppConfig:
+
     def __init__(self):
         self._bitbucket_username = None
         self._bitbucket_app_password = None
         self._aws_access_key_id = None
         self._aws_secret_access_key = None
+        load_dotenv()
 
     @property
     def bitbucket_username(self):
