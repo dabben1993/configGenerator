@@ -23,13 +23,13 @@ validator = ConfigValidator(file_path=git_service.destination + "/yml/test.yml",
 #                          json_output_path=git_service.destination + "/output/test.json")
 
 # Upload it to s3 Bucket
-s3_transfer = S3Transfer(bucket_name='timpabucket', aws_access_key_id=secrets.aws_access_key_id,
-                         aws_secret_access_key=secrets.aws_secret_access_key, region_name="us-east-2",
-                         local_folder_path=git_service.destination + "/output/")
+#s3_transfer = S3Transfer(bucket_name='timpabucket', aws_access_key_id=secrets.aws_access_key_id,
+#                         aws_secret_access_key=secrets.aws_secret_access_key, region_name="us-east-2",
+#                         local_folder_path=git_service.destination + "/output/")
 # s3_transfer.upload_file(local_file_path=git_service.destination + "/output/test.json", s3_object_key="output/test.json")
 
 # Commit, push and pull request
-git_service.create_and_push_to_new_branch(commit_message="This is a commit")
+#git_service.create_and_push_to_new_branch(commit_message="This is a commit")
 #bitbucket_pull_request = BitbucketPullRequestHandler(username=secrets.bitbucket_username,
 #                                                     app_password=secrets.bitbucket_app_password)
 #
