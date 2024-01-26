@@ -4,5 +4,6 @@ refactor validation to single responsibility model on method lvl $
 extract input/output class to handle file $
 create class with object model representation of YML $
 utilize data class when possible change type on db_config $
-replace logger with structlogger
+replace logger with structlogger $
 exception manager
+unit tests
