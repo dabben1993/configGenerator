@@ -1,7 +1,8 @@
 delete config.ini replace to .env file $
 delete set_env_vars class replace with appConfig $
-refactor validation to single responsibility model on method lvl
-extract input/output class to handle file
+refactor validation to single responsibility model on method lvl $
+extract input/output class to handle file $
 create class with object model representation of YML $
-utilize data class when possible
+utilize data class when possible change type on db_config
 replace logger with structlogger
+exception manager
