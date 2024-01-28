@@ -6,8 +6,10 @@ from botocore.exceptions import NoCredentialsError, PartialCredentialsError, Cli
 
 log = structlog.get_logger()
 
+
 class S3Transfer:
-    def __init__(self, bucket_name, local_folder_path, aws_access_key_id=None, aws_secret_access_key=None, region_name=None):
+    def __init__(self, bucket_name, local_folder_path, aws_access_key_id=None, aws_secret_access_key=None,
+                 region_name=None):
         self.bucket_name = bucket_name
         self.aws_access_key_id = aws_access_key_id
         self.aws_secret_access_key = aws_secret_access_key
@@ -64,7 +66,8 @@ class S3Transfer:
                     with open(local_file_path, 'rb') as local_file:
                         self.s3_client.upload_fileobj(local_file, self.bucket_name, s3_object_key)
 
-                    log.info("File uploaded to S3 bucket", bucket_name={self.bucket_name}, uploaded_file={s3_object_key})
+                    log.info("File uploaded to S3 bucket", bucket_name={self.bucket_name},
+                             uploaded_file={s3_object_key})
 
             log.info("Upload complete")
         except (NoCredentialsError, PartialCredentialsError):

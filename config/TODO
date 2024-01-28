@@ -8,7 +8,7 @@ replace logger with structlogger $
 refactor validation to single responsibility model on method lvl on:
     config_validator $
     file_helper $
-    git_service
+    git_service $
     s3_transfer
 exception manager
 unit tests
