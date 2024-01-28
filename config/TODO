@@ -6,8 +6,8 @@ create class with object model representation of YML $
 utilize data class when possible change type on db_config $
 replace logger with structlogger $
 refactor validation to single responsibility model on method lvl on:
-    config_validator
-    file_helper
+    config_validator $
+    file_helper $
     git_service
     s3_transfer
 exception manager
