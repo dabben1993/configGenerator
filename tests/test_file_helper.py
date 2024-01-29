@@ -4,6 +4,8 @@ from io import StringIO
 from unittest.mock import mock_open, patch
 from src.file_helper import FileHelper
 
+from unittest.mock import mock_open, patch
+
 
 class TestFileHelper(unittest.TestCase):
     def setUp(self):
@@ -11,16 +13,14 @@ class TestFileHelper(unittest.TestCase):
         self.destination = "output"
 
     @patch("src.file_helper.os.makedirs")
-    @patch("builtins.open", new_callable=mock_open())
-    def test_read_yaml(self, mock_open, mock_makedirs):
-        # Prepare a fake YAML content
+    def test_read_yaml(self, mock_makedirs):
+        # Test case 1: Reading valid YAML content
         yaml_content = "key: value"
 
-        # Mock the open function to return the fake content
-        with patch("src.file_helper.open", new_callable=mock_open()) as mock_open:
+        with patch("src.file_helper.open", create=True) as mock_open:
             mock_open.return_value = StringIO(yaml_content)
 
-            # Create FileHandler instance
+            # Create FileHelper instance
             file_helper = FileHelper(self.file_path, self.destination)
 
             # Call the read_yaml method
@@ -31,6 +31,37 @@ class TestFileHelper(unittest.TestCase):
 
             # Assert that the result matches the expected YAML content
             self.assertEqual(result, {"key": "value"})
+
+        # Test case 2: Reading invalid YAML content
+        invalid_yaml_content = "invalid_yaml"
+        with patch("src.file_helper.open", create=True) as mock_open:
+            mock_open.return_value = StringIO(invalid_yaml_content)
+
+            # Create FileHelper instance
+            file_helper = FileHelper(self.file_path, self.destination)
+
+            # Call the read_yaml method
+            result = file_helper.read_yaml()
+
+            # Assert that the open function was called with the correct file path
+            mock_open.assert_called_once_with(self.file_path, 'r')
+
+            # Assert that the result is not None due to invalid YAML
+            self.assertIsNotNone(result)
+
+        # Test case 3: Reading from a non-existent file
+        with patch("src.file_helper.open", create=True, side_effect=FileNotFoundError):
+            # Create FileHelper instance
+            file_helper = FileHelper(self.file_path, self.destination)
+
+            # Call the read_yaml method
+            result = file_helper.read_yaml()
+
+            # Assert that the open function was called with the correct file path
+            mock_open.assert_called_once_with(self.file_path, 'r')
+
+            # Assert that the result is None due to file not found
+            self.assertIsNone(result)
 
     @patch("src.file_helper.os.makedirs")
     @patch("builtins.open", new_callable=mock_open())
