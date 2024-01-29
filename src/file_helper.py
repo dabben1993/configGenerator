@@ -6,7 +6,7 @@ from structlog import get_logger
 log = get_logger()
 
 
-class FileHandler:
+class FileHelper:
     def __init__(self, file_path, destination):
         self.file_path = file_path
         self.destination = destination

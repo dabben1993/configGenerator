@@ -3,7 +3,7 @@ from structlog import get_logger
 import cerberus
 import yaml
 from db_config import DbConfig
-from file_helper import FileHandler
+from file_helper import FileHelper
 
 log = get_logger()
 
@@ -16,7 +16,7 @@ class ConfigValidator:
         self.json_output_path = json_output_path
         self.destination = destination
         self.validator = self.load_schema()
-        self.file_handler = FileHandler(self.file_path, self.destination)
+        self.file_handler = FileHelper(self.file_path, self.destination)
         self.process_configuration()
 
     def load_schema(self):
