@@ -10,5 +10,9 @@ refactor validation to single responsibility model on method lvl on:
     file_helper $
     git_service $
     s3_transfer
-exception manager
+exception handling
+    config_validator
+    file_helper
+    git_service $
+    s3_transfer
 unit tests
