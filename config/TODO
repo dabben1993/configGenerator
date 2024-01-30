@@ -29,7 +29,7 @@ refactor classes to make methods static
     file_helper $
     git_service $
     s3_transfer $
-        add methods
-            download_file
-            download_folder
+        add methods$
+            download_file $
+            download_folder $
 
