@@ -1,5 +1,8 @@
+import os
+import sys
 import unittest
 from unittest.mock import patch, MagicMock
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../src'))
 from src.config_validator import ConfigValidator
 
 
