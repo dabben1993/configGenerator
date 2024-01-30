@@ -1,34 +1,35 @@
 from config_validator import ConfigValidator
 from s3_transfer import S3Transfer
 from src.app_config import AppConfig
-from src.git_service import GitService
+import git_service
 
 secrets = AppConfig()
 # Import repo
-git_service = GitService(
-    repo_url="https://dabben93@bitbucket.org/config-generator/test.git",
-    branch="main",
-    destination="../repos/",
-    new_branch_name="git_service_refactor"
+git = git_service.GitService(
+    PAT=secrets.git_access_key
 )
+repository = git_service.clone_repo(repo_url="https://dabben93@bitbucket.org/config-generator/test.git",
+                       branch="main",
+                       destination="../repos/", )
 
 # Validate yml file and convert to JSON
-validator = ConfigValidator(file_path=git_service.destination + "/yml/test.yml",
-                            json_output_path=git_service.destination + "/output/test.json",
-                            destination=git_service.destination + "/output/",
+validator = ConfigValidator(file_path= "../repos/test/yml/test.yml",
+                            json_output_path="../repos/test/output/test.json",
+                            destination="../repos/test/output/",
                             schema_path="../config/cerberus_schema.yml")
 
 # Upload it to s3 Bucket
 s3_transfer = S3Transfer(bucket_name='timpabucket', aws_access_key_id=secrets.aws_access_key_id,
                          aws_secret_access_key=secrets.aws_secret_access_key, region_name="us-east-2",
-                         local_folder_path=git_service.destination + "/output/")
+                         local_folder_path="../repos/test/output/")
 
 # Commit, push and pull request
-git_service.create_and_push_to_new_branch(commit_message="This is a commit")
-#bitbucket_pull_request = BitbucketPullRequestHandler(username=secrets.bitbucket_username,
+git_service.create_and_push_to_new_branch(repository=repository, new_branch_name="neqw_branch",
+                                          commit_message="This is commit #5123")
+# bitbucket_pull_request = BitbucketPullRequestHandler(username=secrets.bitbucket_username,
 #                                                     app_password=secrets.bitbucket_app_password)
 #
-#bitbucket_pull_request.open_pull_request(project_key="test1",
+# bitbucket_pull_request.open_pull_request(project_key="test1",
 #                                         repository_slug="test",
 #                                         source_branch="newTest",
 #                                         destination_branch="main",

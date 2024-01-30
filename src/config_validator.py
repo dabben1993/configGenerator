@@ -3,7 +3,7 @@ from structlog import get_logger
 import cerberus
 import yaml
 from db_config import DbConfig
-from src.file_helper import save_as_json, read_yaml
+import file_helper
 
 log = get_logger()
 
@@ -25,18 +25,18 @@ class ConfigValidator:
             return cerberus.Validator(schema)
 
     def process_configuration(self):
-        config_data = read_yaml(self.file_path)
+        config_data = file_helper.read_yaml(self.file_path)
         if config_data:
             log.info("Config data exists", config_data=config_data)
             db_config = self.create_db_config(config_data)
             if db_config:
                 log.info("db_config object created", object=db_config)
-                save_as_json(data=db_config.to_json(),
+                file_helper.save_as_json(data=db_config.to_json(),
                              file_name=os.path.splitext(os.path.basename(self.file_path))[0],
                              output_directory=self.destination)
                 log.info("File saved")
 
-                save_as_json(data=db_config.to_json(), file_name="db_config", output_directory=self.destination)
+                file_helper.save_as_json(data=db_config.to_json(), file_name="db_config", output_directory=self.destination)
                 log.info("File saved")
 
     def create_db_config(self, config_data):
