@@ -15,8 +15,21 @@ exception handling
     file_helper $
     git_service $
     s3_transfer $
+        NOTE: Need to improve with more handling and not just try catches
+            config_validator
+            file_helper
+            git_service
+            s3_transfer
 unit tests
-    config_validator
+    config_validator //tell test class where to find src
     file_helper $
     git_service
     s3_transfer
+refactor classes to make methods static
+    file_helper $
+    git_service $
+    s3_transfer $
+        add methods
+            download_file
+            download_folder
+

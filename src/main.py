@@ -1,29 +1,34 @@
 from config_validator import ConfigValidator
-from s3_transfer import S3Transfer
 from src.app_config import AppConfig
 import git_service
+import s3_service
 
 secrets = AppConfig()
 # Import repo
 git = git_service.GitService(
     PAT=secrets.git_access_key
 )
+s3 = s3_service.S3Transfer(aws_access_key_id=secrets.aws_access_key_id,
+                        aws_secret_access_key=secrets.aws_secret_access_key,
+                        region_name="us-east-2")
+
 repository = git_service.clone_repo(repo_url="https://dabben93@bitbucket.org/config-generator/test.git",
-                       branch="main",
-                       destination="../repos/", )
+                                    branch="main",
+                                    destination="../repos/", )
 
 # Validate yml file and convert to JSON
-validator = ConfigValidator(file_path= "../repos/test/yml/test.yml",
+validator = ConfigValidator(file_path="../repos/test/yml/test.yml",
                             json_output_path="../repos/test/output/test.json",
                             destination="../repos/test/output/",
                             schema_path="../config/cerberus_schema.yml")
 
 # Upload it to s3 Bucket
-s3_transfer = S3Transfer(bucket_name='timpabucket', aws_access_key_id=secrets.aws_access_key_id,
-                         aws_secret_access_key=secrets.aws_secret_access_key, region_name="us-east-2",
-                         local_folder_path="../repos/test/output/")
-
+service = s3_service.create_s3_client(s3)
+s3_service.upload_folder(s3_client=service, local_folder_path="../repos/test/output/",
+                         bucket_name="timpabucket")
+# s3_service.download_file(service, "timpabucket", "test.json", "../tests/test.json")
 # Commit, push and pull request
+# s3_service.download_folder(service, "timpabucket", "output/", "../tests/tests")
 git_service.create_and_push_to_new_branch(repository=repository, new_branch_name="neqw_branch",
                                           commit_message="This is commit #5123")
 # bitbucket_pull_request = BitbucketPullRequestHandler(username=secrets.bitbucket_username,
