@@ -2,8 +2,8 @@ import os
 from structlog import get_logger
 import cerberus
 import yaml
-from db_config import DbConfig
-from file_helper import FileHelper
+from .db_config import DbConfig
+from .file_helper import FileHelper
 
 log = get_logger()
 

@@ -10,6 +10,7 @@ class AppConfig:
         self._bitbucket_app_password = None
         self._aws_access_key_id = None
         self._aws_secret_access_key = None
+        self._git_access_key = None
         load_dotenv()
 
     @property
@@ -35,3 +36,9 @@ class AppConfig:
         if not self._aws_secret_access_key:
             self._aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
         return self._aws_secret_access_key
+
+    @property
+    def git_access_key(self):
+        if not self._git_access_key:
+            self._git_access_key = os.getenv("GIT_ACCESS_KEY")
+        return self._git_access_key
