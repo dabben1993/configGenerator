@@ -60,6 +60,19 @@ class GitService:
             raise ServiceException("Error cloning repository",
                                    original_exception=e)
 
+    def list_remote_branches(self):
+        try:
+            self.log.info("Fetching remote branches")
+            remote_branches = [ref.name.split('/')[-1] for ref in self.repo.remotes.origin.refs if ref.remote_head]
+
+            self.log.info("Remote branches:")
+            for branch in remote_branches:
+                self.log.info("Branch", branch_name=branch)
+
+        except Exception as e:
+            self.log.warning("Error listing remote branches", error=str(e))
+            raise
+
     def checkout_new_branch(self, branch_name):
         try:
             checked_out_branch = self.repo.active_branch.name

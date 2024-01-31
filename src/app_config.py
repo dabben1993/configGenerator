@@ -40,5 +40,5 @@ class AppConfig:
     @property
     def git_access_key(self):
         if not self._git_access_key:
-            self._git_access_key = os.getenv("GIT_ACCESS_KEY")
+            self._git_access_key = os.getenv("GIT_ACCESS_TOKEN")
         return self._git_access_key
