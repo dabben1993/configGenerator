@@ -27,10 +27,10 @@ class S3Transfer:
             if e.response['Error']['Code'] == '404':
                 return False  # Object does not exist
             log.warning("Object does not exist", error={e})
-            return ServiceException("Object does not exist", original_exception=e)
-        except (NoCredentialsError, PartialCredentialsError, ClientError) as e:
+            raise ServiceException("Object does not exist", original_exception=e)
+        except (NoCredentialsError, PartialCredentialsError) as e:
             log.warning("AWS credentials not available", error={e})
-            return ServiceException("AWS credentials not available", original_exception=e)
+            raise ServiceException("AWS credentials not available", original_exception=e)
 
     def upload_file(self, local_file_path, s3_object_key, bucket_name):
         try:
@@ -41,7 +41,7 @@ class S3Transfer:
             log.info("File uploaded to S3 bucket", bucket_name={bucket_name}, uploaded_file={s3_object_key})
         except (NoCredentialsError, PartialCredentialsError) as e:
             log.warning("AWS credentials not available. Make sure you have configured your credentials.")
-            return ServiceException("AWS credentials not available", original_exception=e)
+            raise ServiceException("AWS credentials not available", original_exception=e)
 
     def upload_folder(self, local_folder_path, bucket_name, s3_prefix=''):
         try:
@@ -63,16 +63,16 @@ class S3Transfer:
             log.info("Upload complete")
         except (NoCredentialsError, PartialCredentialsError) as e:
             log.warning("AWS credentials not available. Make sure you have configured your credentials.")
-            return ServiceException("AWS credentials not available", original_exception=e)
+            raise ServiceException("AWS credentials not available", original_exception=e)
 
     def download_file(self, bucket_name, object_key, destination):
         try:
             log.info("Downloading file from S3", bucket=bucket_name, object_key=object_key)
             self.s3_client.download_file(Bucket=bucket_name, Key=object_key, Filename=destination)
             log.info("File downloaded successfully", destination=destination)
-        except botocore.exceptions.ClientError as e:
+        except ClientError as e:
             log.error("Error downloading file from S3", error=str(e))
-            return ServiceException("Error downloading file from S3", original_exception=e)
+            raise ServiceException("Error downloading file from S3", original_exception=e)
 
     def download_folder(self, bucket_name, prefix, destination):
         try:
@@ -88,9 +88,9 @@ class S3Transfer:
                                    object_key=key, destination=dest_file_path)
 
             log.info("Folder downloaded successfully", destination_path=destination)
-        except botocore.exceptions.ClientError as e:
+        except ClientError as e:
             log.error("Error downloading folder from S3", error=str(e))
-            return ServiceException("Error downloading folder from S3", original_exception=e)
+            raise ServiceException("Error downloading folder from S3", original_exception=e)
 
     def list_all_objects(self, bucket_name):
         try:
@@ -98,9 +98,9 @@ class S3Transfer:
             response = self.s3_client.list_objects(Bucket=bucket_name)
             for obj in response.get('Contents', []):
                 log.info("Item", item_name=obj['Key'])
-        except botocore.exceptions.ClientError as e:
+        except ClientError as e:
             log.error("Error listing objects from S3", error=str(e))
-            return ServiceException("Error listing objects from S3", original_exception=e)
+            raise ServiceException("Error listing objects from S3", original_exception=e)
 
     def list_objects_in_folder(self, bucket_name, prefix):
         try:
@@ -108,9 +108,9 @@ class S3Transfer:
             response = self.s3_client.list_objects(Bucket=bucket_name, Prefix=prefix)
             for obj in response.get('Contents', []):
                 log.info("Item", item_name=obj['Key'])
-        except botocore.exceptions.ClientError as e:
+        except ClientError as e:
             log.error("Error listing objects from S3", error=str(e))
-            return ServiceException("Error downloading folder from S3", original_exception=e)
+            raise ServiceException("Error downloading folder from S3", original_exception=e)
 
     def _create_s3_client(self):
         return boto3.client(
