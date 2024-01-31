@@ -1,5 +1,3 @@
-import logging
-
 from config_validator import ConfigValidator
 from src.app_config import AppConfig
 import git_service
@@ -18,18 +16,18 @@ git.repo = git.clone_repo(repo_url="https://dabben93@bitbucket.org/config-genera
 # Validate yml file and convert to JSON
 validator = ConfigValidator(repo_path=git.repo.working_dir,
                             json_output_path=git.repo.working_dir + "/output/test.json",
-                            destination="../repos/test/output/",
+                            destination=git.repo.working_dir + "/output/",
                             schema_path="../config/cerberus_schema.yml",
                             file_name="test.yml")
 
 git.list_remote_branches()
 
-# Upload it to s3 Bucket
-git.create_and_push_to_new_branch(new_branch_name="final_refactortr",
-                                  commit_message="this is commit 215332")
-s3.list_all_objects("timpabucket")
 
-s3.upload_folder(local_folder_path="../repos/test/output/",
+git.create_and_push_to_new_branch(new_branch_name="test_final",
+                                  commit_message="this is commit 215332")
+
+
+s3.upload_folder(local_folder_path=git.repo.working_dir + "/output/",
                          bucket_name="timpabucket", s3_prefix="final/")
 s3.download_folder("timpabucket", "final/", "../tests/final")
 git.switch_branch("main")
