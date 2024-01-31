@@ -34,4 +34,9 @@ write own exception wrapper
         implement on:
             s3_Service $
             git_service $
+Documentation
+    config_validator
+    file_helper
+    git_service
+    s3_service
 
