@@ -28,8 +28,15 @@ unit tests
 refactor classes to make methods static
     file_helper $
     git_service $
+        add methods
+            list_branches
     s3_transfer $
         add methods$
             download_file $
             download_folder $
+write own exception wrapper
+    service_exception $
+        implement on:
+            s3_Service $
+            git_service
 
