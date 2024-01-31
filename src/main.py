@@ -31,7 +31,7 @@ s3.upload_folder(local_folder_path=git.repo.working_dir + "/output/",
                          bucket_name="timpabucket", s3_prefix="final/")
 s3.download_folder("timpabucket", "final/", "../tests/final")
 git.switch_branch("main")
-
+git.delete_local_branch("test_final")
 
 # bitbucket_pull_request = BitbucketPullRequestHandler(username=secrets.bitbucket_username,
 #                                                     app_password=secrets.bitbucket_app_password)

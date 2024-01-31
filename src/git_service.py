@@ -115,6 +115,11 @@ class GitService:
             raise ServiceException("Error pushing changes to remote repository",
                                    original_exception=e)
 
+    def delete_local_branch(self, branch_name):
+        self.repo.delete_head(branch_name, force=True)
+        self.log.info("Branch deleted", branch=branch_name)
+
+
     def create_and_push_to_new_branch(self, new_branch_name, commit_message):
         try:
             self.checkout_new_branch(branch_name=new_branch_name)
