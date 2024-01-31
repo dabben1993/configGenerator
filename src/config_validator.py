@@ -13,11 +13,12 @@ log = get_logger()
 
 class ConfigValidator:
 
-    def __init__(self, schema_path, file_path, json_output_path=None, destination=None):
+    def __init__(self, schema_path, repo_path, json_output_path=None, destination=None, file_name=None):
         self.schema_path = schema_path
-        self.file_path = file_path
+        self.repo_path = repo_path
         self.json_output_path = json_output_path
         self.destination = destination
+        self.file_name = file_name
         self.validator = self.load_schema()
         self.process_configuration()
 
@@ -28,14 +29,14 @@ class ConfigValidator:
             return cerberus.Validator(schema)
 
     def process_configuration(self):
-        config_data = file_helper.read_yaml(self.file_path)
+        config_data = file_helper.read_yaml(file_helper.find_file_path(self.repo_path, self.file_name))
         if config_data:
             log.info("Config data exists", config_data=config_data)
             db_config = self.create_db_config(config_data)
             if db_config:
                 log.info("db_config object created", object=db_config)
                 file_helper.save_as_json(data=json.dumps({"config": asdict(db_config)}, indent=2),
-                             file_name=os.path.splitext(os.path.basename(self.file_path))[0],
+                             file_name=os.path.splitext(os.path.basename(self.repo_path))[0],
                              output_directory=self.destination)
                 log.info("File saved")
 
