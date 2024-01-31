@@ -16,21 +16,6 @@ def get_repo_name(repo_url):
         raise
 
 
-def update_existing_repo(destination, repo_name):
-    try:
-        repo = Repo(destination)
-        log.info("Repository exists", repo=repo_name, status="Updating...")
-        origin = repo.remote(name='origin')
-        origin.pull()
-        return repo
-    except GitCommandError as git_error:
-        log.error("Error updating existing repository", error=str(git_error))
-        raise
-    except Exception as e:
-        log.error("Unexpected error during repository update", error=str(e))
-        raise
-
-
 def clone_new_repo(repo_url, destination, branch):
     try:
         repo = Repo.clone_from(repo_url, destination, branch=branch)
@@ -42,74 +27,97 @@ def clone_new_repo(repo_url, destination, branch):
         raise
 
 
-def clone_repo(repo_url, destination, branch):
-    try:
-        repo_name = get_repo_name(repo_url)
-        destination = os.path.join(destination, repo_name)
-
-        if os.path.exists(destination):
-            return update_existing_repo(repo_name=repo_name, destination=destination)
-        else:
-            return clone_new_repo(repo_url=repo_url, destination=destination, branch=branch)
-    except Exception as e:
-        log.warning("Error cloning repository", error=str(e))
-        raise
-
-
-def checkout_new_branch(repository, branch_name):
-    try:
-        checked_out_branch = repository.active_branch.name
-        repository.git.checkout(b=branch_name)
-        log.info("Branch created and checked out", branch_checked_out_from=checked_out_branch,
-                 branch_checked_out=branch_name)
-    except Exception as e:
-        log.warning("Error checking out new branch", error=str(e))
-        raise
-
-
-def switch_branch(repository, branch_name):
-    try:
-        checked_out_branch = repository.active_branch.name
-        repository.git.switch(branch_name)
-        log.info("Switched branch", branch_checked_out_from=checked_out_branch,
-                 branch_checked_out=branch_name)
-    except Exception as e:
-        log.warning("Error checking out new branch", error=str(e))
-        raise
-
-
-def commit_changes(repository, commit_message):
-    try:
-        repository.git.add("--all")
-        repository.index.commit(commit_message)
-        log.info("Changes committed", commit_message=commit_message)
-    except Exception as e:
-        log.warning("Error committing changes", error=str(e))
-        raise
-
-
-def push_changes(repository):
-    try:
-        origin = repository.remote(name='origin')
-        origin.push(refspec=f'{repository.active_branch.name}:{repository.active_branch.name}')
-        log.info("Changes pushed", pushed_to_branch=repository.active_branch.name)
-    except GitCommandError as e:
-        log.warning("Error pushing changes to the remote repository", error=str(e))
-        raise
-
-
-def create_and_push_to_new_branch(repository, new_branch_name, commit_message):
-    try:
-        checkout_new_branch(repository=repository, branch_name=new_branch_name)
-        commit_changes(repository=repository, commit_message=commit_message)
-        push_changes(repository=repository)
-
-    except GitCommandError as e:
-        log.warning("Error creating or pushing changes to the new file", error={e})
-
-
 class GitService:
     def __init__(self, pat=None, user_name=None, password=None):
         self.pat = pat
         self.user_name = user_name
         self.password = password
+        self.repo = Repo
+
+    def update_existing_repo(self, repo_name):
+        try:
+
+            log.info("Repository exists", repo=repo_name, status="Updating...")
+            origin = self.repo.remote(name='origin')
+            origin.pull()
+            return repo
+        except GitCommandError as git_error:
+            log.error("Error updating existing repository", error=str(git_error))
+            raise
+        except Exception as e:
+            log.error("Unexpected error during repository update", error=str(e))
+            raise
+
+    def clone_repo(self, repo_url, destination, branch):
+        try:
+            repo_name = get_repo_name(repo_url)
+            destination = os.path.join(destination, repo_name)
+
+            if os.path.exists(destination):
+                return self.update_existing_repo(repo_name=repo_name)
+            else:
+                return clone_new_repo(repo_url=repo_url, destination=destination, branch=branch)
+        except Exception as e:
+            log.warning("Error cloning repository", error=str(e))
+            raise
+
+    def list_remote_branches(self):
+        try:
+            log.info("Fetching remote branches", repository=self.repo)
+            self.repo.remotes.origin.fetch()
+            remote_branches = [ref.remote_head for ref in self.repo.refs if
+                               ref.remote_head and ref.remote_head.startswith('refs/heads/origin/')]
+            log.info("Remote branches", repository=self.repo)
+            for branch in remote_branches:
+                log.info("Branch", branch=branch)
+
+        except Exception as e:
+            log.warning("Error cloning repository", error=str(e))
+            raise
+
+    def checkout_new_branch(self, branch_name):
+        try:
+            checked_out_branch = self.repo.active_branch.name
+            self.repo.git.checkout(b=branch_name)
+            log.info("Branch created and checked out", branch_checked_out_from=checked_out_branch,
+                     branch_checked_out=branch_name)
+        except Exception as e:
+            log.warning("Error checking out new branch", error=str(e))
+            raise
+
+    def switch_branch(self, branch_name):
+        try:
+            checked_out_branch = self.repo.active_branch.name
+            self.repo.git.switch(branch_name)
+            log.info("Switched branch", branch_checked_out_from=checked_out_branch,
+                     branch_checked_out=branch_name)
+        except Exception as e:
+            log.warning("Error checking out new branch", error=str(e))
+            raise
+
+    def commit_changes(self, commit_message):
+        try:
+            self.repo.git.add("--all")
+            self.repo.index.commit(commit_message)
+            log.info("Changes committed", commit_message=commit_message)
+        except Exception as e:
+            log.warning("Error committing changes", error=str(e))
+            raise
+
+    def push_changes(self):
+        try:
+            origin = self.repo.remote(name='origin')
+            origin.push(refspec=f'{self.repo.active_branch.name}:{self.repo.active_branch.name}')
+            log.info("Changes pushed", pushed_to_branch=self.repo.active_branch.name)
+        except GitCommandError as e:
+            log.warning("Error pushing changes to the remote repository", error=str(e))
+            raise
+
+    def create_and_push_to_new_branch(self, new_branch_name, commit_message):
+        try:
+            self.checkout_new_branch(branch_name=new_branch_name)
+            self.commit_changes(commit_message=commit_message)
+            self.push_changes()
+
+        except GitCommandError as e:
+            log.warning("Error creating or pushing changes to the new file", error={e})

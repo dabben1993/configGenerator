@@ -4,32 +4,34 @@ import git_service
 import s3_service
 
 secrets = AppConfig()
-# git = git_service.GitService(pat=secrets.git_access_key)
+git = git_service.GitService(pat=secrets.git_access_key)
 s3 = s3_service.S3Transfer(aws_access_key_id=secrets.aws_access_key_id,
-                        aws_secret_access_key=secrets.aws_secret_access_key,
-                        region_name="us-east-2")
+                           aws_secret_access_key=secrets.aws_secret_access_key,
+                           region_name="us-east-2")
 
-# repository = git_service.clone_repo(repo_url="https://dabben93@bitbucket.org/config-generator/test.git",
-#                                    branch="main",
-#                                    destination="../repos/", )
-
+git.repo = git.clone_repo(repo_url="https://dabben93@bitbucket.org/config-generator/test.git",
+                          branch="main",
+                          destination="../repos/")
+git.create_and_push_to_new_branch(new_branch_name="test_refactor",
+                                  commit_message="This is commit #5123")
 # Validate yml file and convert to JSON
 # validator = ConfigValidator(file_path="../repos/test/yml/test.yml",
 #                            json_output_path="../repos/test/output/test.json",
 #                            destination="../repos/test/output/",
 #                            schema_path="../config/cerberus_schema.yml")
 
+# git_service.list_remote_branches(repository)
 # Upload it to s3 Bucket
-service = s3_service.create_s3_client(s3)
-s3_service.list_all_objects(service, "timpabucket")
-s3_service.list_objects_in_folder(service, "timpabucket", "test/")
+# service = s3_service.create_s3_client(s3)
+s3.list_all_objects("timpabucket")
+s3.list_objects_in_folder("timpabucket", "test/")
 # s3_service.upload_folder(s3_client=service, local_folder_path="../repos/test/output/",
 #                         bucket_name="timpabucket")
 # s3_service.download_file(service, "timpabucket", "test.json", "../tests/test.json")
 # s3_service.download_folder(service, "timpabucket", "output/", "../tests/tests")
-#git_service.create_and_push_to_new_branch(repository=repository, new_branch_name="freshly_pressed",
+# git_service.create_and_push_to_new_branch(repository=repository, new_branch_name="freshly_pressed",
 #                                          commit_message="This is commit #5123")
-#git_service.switch_branch(repository, "main")
+# git_service.switch_branch(repository, "main")
 # bitbucket_pull_request = BitbucketPullRequestHandler(username=secrets.bitbucket_username,
 #                                                     app_password=secrets.bitbucket_app_password)
 #
