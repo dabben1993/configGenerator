@@ -9,27 +9,22 @@ refactor validation to single responsibility model on method lvl on:
     config_validator $
     file_helper $
     git_service $
-    s3_transfer
+    s3_transfer $
 exception handling
     config_validator $
     file_helper $
     git_service $
     s3_transfer $
-        NOTE: Need to improve with more handling and not just try catches
-            config_validator
-            file_helper
-            git_service
-            s3_transfer
 unit tests
     config_validator //tell test class where to find src
     file_helper $
     git_service
     s3_transfer
-refactor classes to make methods static
+refactor classes to make methods static $
     file_helper $
     git_service $
         add methods
-            list_branches
+            list_branches $
     s3_transfer $
         add methods$
             download_file $
@@ -38,5 +33,5 @@ write own exception wrapper
     service_exception $
         implement on:
             s3_Service $
-            git_service
+            git_service $
 

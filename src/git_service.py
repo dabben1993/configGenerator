@@ -1,5 +1,5 @@
 import os
-from git import Repo, repo
+from git import Repo
 from git.exc import GitCommandError
 import structlog
 
@@ -120,7 +120,6 @@ class GitService:
             self.checkout_new_branch(branch_name=new_branch_name)
             self.commit_changes(commit_message=commit_message)
             self.push_changes()
-            self.switch_branch('main')
 
         except ServiceException as e:
             self.log.warning("Error creating or pushing changes to the new file", error={e})
