@@ -4,6 +4,7 @@ import git_service
 import s3_service
 
 secrets = AppConfig()
+branch_name = "final_test"
 git = git_service.GitService(pat=secrets.git_access_key)
 s3 = s3_service.S3Transfer(aws_access_key_id=secrets.aws_access_key_id,
                            aws_secret_access_key=secrets.aws_secret_access_key,
@@ -23,7 +24,7 @@ validator = ConfigValidator(repo_path=git.repo.working_dir,
 git.list_remote_branches()
 
 
-git.create_and_push_to_new_branch(new_branch_name="test_final",
+git.create_and_push_to_new_branch(new_branch_name=branch_name,
                                   commit_message="this is commit 215332")
 
 
@@ -31,7 +32,7 @@ s3.upload_folder(local_folder_path=git.repo.working_dir + "/output/",
                          bucket_name="timpabucket", s3_prefix="final/")
 s3.download_folder("timpabucket", "final/", "../tests/final")
 git.switch_branch("main")
-git.delete_local_branch("test_final")
+git.delete_local_branch(branch_name)
 
 # bitbucket_pull_request = BitbucketPullRequestHandler(username=secrets.bitbucket_username,
 #                                                     app_password=secrets.bitbucket_app_password)
