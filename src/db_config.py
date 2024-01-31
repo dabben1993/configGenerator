@@ -1,16 +1,24 @@
-import json
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 
-import yaml
+
+@dataclass
+class DatabaseConfig:
+    host: str
+    port: int
+    username: str
+    password: str
+
+
+@dataclass
+class LoggingConfig:
+    level: str
+    file_path: str
 
 
 @dataclass
 class DbConfig:
-    database: dict
-    logging: dict
-
-    def to_json(self):
-        return json.dumps({"config": asdict(self)}, indent=2)
+    database: DatabaseConfig
+    logging: LoggingConfig
 
     def __repr__(self):
         return f"DbConfig(database={self.database}, logging={self.logging})"

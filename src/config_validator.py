@@ -1,4 +1,7 @@
+import json
 import os
+from dataclasses import asdict
+
 from structlog import get_logger
 import cerberus
 import yaml
@@ -31,12 +34,13 @@ class ConfigValidator:
             db_config = self.create_db_config(config_data)
             if db_config:
                 log.info("db_config object created", object=db_config)
-                file_helper.save_as_json(data=db_config.to_json(),
+                file_helper.save_as_json(data=json.dumps({"config": asdict(db_config)}, indent=2),
                              file_name=os.path.splitext(os.path.basename(self.file_path))[0],
                              output_directory=self.destination)
                 log.info("File saved")
 
-                file_helper.save_as_json(data=db_config.to_json(), file_name="db_config", output_directory=self.destination)
+                file_helper.save_as_json(data=json.dumps({"config": asdict(db_config)}, indent=2),
+                                         file_name="db_config", output_directory=self.destination)
                 log.info("File saved")
 
     def create_db_config(self, config_data):
