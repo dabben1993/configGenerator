@@ -1,12 +1,9 @@
 import os
 
 import boto3
-import botocore
 import structlog
 from botocore.exceptions import NoCredentialsError, PartialCredentialsError, ClientError
 from service_exception import ServiceException
-
-log = structlog.get_logger()
 
 
 class S3Transfer:
@@ -16,6 +13,7 @@ class S3Transfer:
         self.aws_secret_access_key = aws_secret_access_key
         self.region_name = region_name
         self.s3_client = self._create_s3_client()
+        self.log = structlog.get_logger()
 
     def object_exists(self, bucket_name, s3_object_key):
         try:
@@ -26,21 +24,21 @@ class S3Transfer:
         except ClientError as e:
             if e.response['Error']['Code'] == '404':
                 return False  # Object does not exist
-            log.warning("Object does not exist", error={e})
+            self.log.warning("Object does not exist", error={e})
             raise ServiceException("Object does not exist", original_exception=e)
         except (NoCredentialsError, PartialCredentialsError) as e:
-            log.warning("AWS credentials not available", error={e})
+            self.log.warning("AWS credentials not available", error={e})
             raise ServiceException("AWS credentials not available", original_exception=e)
 
     def upload_file(self, local_file_path, s3_object_key, bucket_name):
         try:
             if self.object_exists(bucket_name=bucket_name, s3_object_key=s3_object_key):
-                log.info("File already exists", file={s3_object_key}, status="Updating...")
+                self.log.info("File already exists", file={s3_object_key}, status="Updating...")
             with open(local_file_path, 'rb') as local_file:
                 self.s3_client.upload_fileobj(local_file, bucket_name, s3_object_key)
-            log.info("File uploaded to S3 bucket", bucket_name={bucket_name}, uploaded_file={s3_object_key})
+            self.log.info("File uploaded to S3 bucket", bucket_name={bucket_name}, uploaded_file={s3_object_key})
         except (NoCredentialsError, PartialCredentialsError) as e:
-            log.warning("AWS credentials not available. Make sure you have configured your credentials.")
+            self.log.warning("AWS credentials not available. Make sure you have configured your credentials.")
             raise ServiceException("AWS credentials not available", original_exception=e)
 
     def upload_folder(self, local_folder_path, bucket_name, s3_prefix=''):
@@ -52,31 +50,31 @@ class S3Transfer:
                     s3_object_key = os.path.join(s3_prefix, relative_path).replace('\\', '/')
 
                     if self.object_exists(bucket_name=bucket_name, s3_object_key=s3_object_key):
-                        log.info("File already exists", file={s3_object_key}, status="Updating...")
+                        self.log.info("File already exists", file={s3_object_key}, status="Updating...")
 
                     with open(local_file_path, 'rb') as local_file:
                         self.s3_client.upload_fileobj(local_file, bucket_name, s3_object_key)
 
-                    log.info("File uploaded to S3 bucket", bucket_name={bucket_name},
+                    self.log.info("File uploaded to S3 bucket", bucket_name={bucket_name},
                              uploaded_file={s3_object_key})
 
-            log.info("Upload complete")
+            self.log.info("Upload complete")
         except (NoCredentialsError, PartialCredentialsError) as e:
-            log.warning("AWS credentials not available. Make sure you have configured your credentials.")
+            self.log.warning("AWS credentials not available. Make sure you have configured your credentials.")
             raise ServiceException("AWS credentials not available", original_exception=e)
 
     def download_file(self, bucket_name, object_key, destination):
         try:
-            log.info("Downloading file from S3", bucket=bucket_name, object_key=object_key)
+            self.log.info("Downloading file from S3", bucket=bucket_name, object_key=object_key)
             self.s3_client.download_file(Bucket=bucket_name, Key=object_key, Filename=destination)
-            log.info("File downloaded successfully", destination=destination)
+            self.log.info("File downloaded successfully", destination=destination)
         except ClientError as e:
-            log.error("Error downloading file from S3", error=str(e))
+            self.log.error("Error downloading file from S3", error=str(e))
             raise ServiceException("Error downloading file from S3", original_exception=e)
 
     def download_folder(self, bucket_name, prefix, destination):
         try:
-            log.info("Downloading folder from S3", bucket=bucket_name, prefix=prefix)
+            self.log.info("Downloading folder from S3", bucket=bucket_name, prefix=prefix)
             objects = self.s3_client.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
             if not os.path.exists(destination):
                 os.makedirs(destination)
@@ -87,29 +85,29 @@ class S3Transfer:
                 self.download_file(bucket_name=bucket_name,
                                    object_key=key, destination=dest_file_path)
 
-            log.info("Folder downloaded successfully", destination_path=destination)
+            self.log.info("Folder downloaded successfully", destination_path=destination)
         except ClientError as e:
-            log.error("Error downloading folder from S3", error=str(e))
+            self.log.error("Error downloading folder from S3", error=str(e))
             raise ServiceException("Error downloading folder from S3", original_exception=e)
 
     def list_all_objects(self, bucket_name):
         try:
-            log.info("Listing all items in bucket", bucket_name=bucket_name)
+            self.log.info("Listing all items in bucket", bucket_name=bucket_name)
             response = self.s3_client.list_objects(Bucket=bucket_name)
             for obj in response.get('Contents', []):
-                log.info("Item", item_name=obj['Key'])
+                self.log.info("Item", item_name=obj['Key'])
         except ClientError as e:
-            log.error("Error listing objects from S3", error=str(e))
+            self.log.error("Error listing objects from S3", error=str(e))
             raise ServiceException("Error listing objects from S3", original_exception=e)
 
     def list_objects_in_folder(self, bucket_name, prefix):
         try:
-            log.info("Listing objects in folder", bucket=bucket_name, folder=prefix)
+            self.log.info("Listing objects in folder", bucket=bucket_name, folder=prefix)
             response = self.s3_client.list_objects(Bucket=bucket_name, Prefix=prefix)
             for obj in response.get('Contents', []):
-                log.info("Item", item_name=obj['Key'])
+                self.log.info("Item", item_name=obj['Key'])
         except ClientError as e:
-            log.error("Error listing objects from S3", error=str(e))
+            self.log.error("Error listing objects from S3", error=str(e))
             raise ServiceException("Error downloading folder from S3", original_exception=e)
 
     def _create_s3_client(self):
