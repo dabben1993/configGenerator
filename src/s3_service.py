@@ -86,6 +86,28 @@ def download_folder(s3_client, bucket_name, prefix, destination):
         raise
 
 
+def list_all_objects(s3_client, bucket_name):
+    try:
+        log.info("Listing all items in bucket", bucket_name=bucket_name)
+        response = s3_client.list_objects(Bucket=bucket_name)
+        for obj in response.get('Contents', []):
+            log.info("Item", item_name=obj['Key'])
+    except botocore.exceptions.ClientError as e:
+        log.error("Error downloading folder from S3", error=str(e))
+        raise
+
+
+def list_objects_in_folder(s3_client, bucket_name, prefix):
+    try:
+        log.info("Listing objects in folder", bucket=bucket_name, folder=prefix)
+        response = s3_client.list_objects(Bucket=bucket_name, Prefix=prefix)
+        for obj in response.get('Contents', []):
+            log.info("Item", item_name=obj['Key'])
+    except botocore.exceptions.ClientError as e:
+        log.error("Error downloading folder from S3", error=str(e))
+        raise
+
+
 def create_s3_client(secrets):
     return boto3.client(
         's3',
