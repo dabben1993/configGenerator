@@ -6,7 +6,7 @@ import s3_service
 secrets = AppConfig()
 # Import repo
 git = git_service.GitService(
-    PAT=secrets.git_access_key
+    pat=secrets.git_access_key
 )
 s3 = s3_service.S3Transfer(aws_access_key_id=secrets.aws_access_key_id,
                         aws_secret_access_key=secrets.aws_secret_access_key,
@@ -29,8 +29,9 @@ s3_service.upload_folder(s3_client=service, local_folder_path="../repos/test/out
 # s3_service.download_file(service, "timpabucket", "test.json", "../tests/test.json")
 # Commit, push and pull request
 # s3_service.download_folder(service, "timpabucket", "output/", "../tests/tests")
-git_service.create_and_push_to_new_branch(repository=repository, new_branch_name="neqw_branch",
+git_service.create_and_push_to_new_branch(repository=repository, new_branch_name="freshly_pressed",
                                           commit_message="This is commit #5123")
+git_service.switch_branch(repository, "main")
 # bitbucket_pull_request = BitbucketPullRequestHandler(username=secrets.bitbucket_username,
 #                                                     app_password=secrets.bitbucket_app_password)
 #

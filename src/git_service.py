@@ -56,11 +56,22 @@ def clone_repo(repo_url, destination, branch):
         raise
 
 
-def checkout_new_branch(repository, branch_name=None):
+def checkout_new_branch(repository, branch_name):
     try:
         checked_out_branch = repository.active_branch.name
         repository.git.checkout(b=branch_name)
         log.info("Branch created and checked out", branch_checked_out_from=checked_out_branch,
+                 branch_checked_out=branch_name)
+    except Exception as e:
+        log.warning("Error checking out new branch", error=str(e))
+        raise
+
+
+def switch_branch(repository, branch_name):
+    try:
+        checked_out_branch = repository.active_branch.name
+        repository.git.switch(branch_name)
+        log.info("Switched branch", branch_checked_out_from=checked_out_branch,
                  branch_checked_out=branch_name)
     except Exception as e:
         log.warning("Error checking out new branch", error=str(e))
@@ -98,7 +109,7 @@ def create_and_push_to_new_branch(repository, new_branch_name, commit_message):
 
 
 class GitService:
-    def __init__(self, PAT=None, user_name=None, password=None):
-        self.pat = PAT
+    def __init__(self, pat=None, user_name=None, password=None):
+        self.pat = pat
         self.user_name = user_name
         self.password = password
