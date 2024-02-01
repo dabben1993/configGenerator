@@ -7,6 +7,10 @@ pipeline {
         timestamps()
     }
 
+    environment {
+        PYTHON_PATH = 'C:\\Users\\tbarkman\\AppData\\Local\\Programs\\Python\\Python312'
+    }
+
     stages {
 
         stage('Setup') {
