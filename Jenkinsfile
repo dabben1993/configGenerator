@@ -11,7 +11,7 @@ pipeline {
         stage('Setup') {
             steps {
                 script {
-                    bat 'pip install -r requirements.txt'
+                    bat 'C:\\Users\\tbarkman\\AppData\\Local\\Programs\\Python\\Python312\\Scripts\\pip.exe install -r requirements.exe'
                 }
             }
         }
@@ -19,7 +19,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    bat 'python -m unittest discover -s tests'
+                    bat 'C:\\Users\\tbarkman\\AppData\\Local\\Programs\\Python\\Python312\\python.exe -m unittest discover -s tests'
                 }
             }
         }
