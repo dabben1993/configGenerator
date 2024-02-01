@@ -25,9 +25,9 @@ pipeline {
             steps {
                 script {
                     environment {
-                        GIT_ACCESS_TOKEN = credentials('your-git-access-token-credential-id')
-                        AWS_SECRET_KEY_ID = credentials('your-aws-access-key-id-credential-id')
-                        AWS_SECRET_ACCESS_KEY = credentials('your-aws-secret-access-key-credential-id')
+                        GIT_ACCESS_TOKEN = credentials('GIT_ACCESS_TOKEN')
+                        AWS_SECRET_KEY_ID = credentials('AWS_SECRET_KEY_ID')
+                        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
                     }
 
                     dir('src') {
