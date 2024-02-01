@@ -11,7 +11,7 @@ pipeline {
         stage('Setup') {
             steps {
                 script {
-                    sh 'pip install -r requirements.txt'
+                    bat 'pip install -r requirements.txt'
                 }
             }
         }
@@ -19,9 +19,12 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    sh 'python -m unittest discover -s tests'
+                    bat 'python -m unittest discover -s tests'
                 }
             }
         }
+    }
+
+    post {
     }
 }
