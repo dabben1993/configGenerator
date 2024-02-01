@@ -26,5 +26,14 @@ pipeline {
     }
 
     post {
+        always {
+            echo 'always'
+        }
+        success {
+            echo 'Build and test succeeded'
+        }
+        failure {
+            echo 'Build and test failed'
+        }
     }
 }
