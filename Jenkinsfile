@@ -1,6 +1,17 @@
 pipeline {
     agent any
 
+    options {
+        // Set the working dir for the entire pipeline
+        buildDiscarder(logRotator(artifactNumToKeepStr: '1', numToKeepStr: '5'))
+        disableConcurrentBuilds()
+        timestamps()
+    }
+
+    environment {
+        PYTHON_PATH = 'C:\\Users\\tbarkman\\AppData\\Local\\Programs\\Python\\Python312'
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -11,7 +22,7 @@ pipeline {
         stage('Setup') {
             steps {
                 script {
-                    bat 'C:\\Users\\tbarkman\\AppData\\Local\\Programs\\Python\\Python312\\Scripts\\pip.exe install -r requirements.exe'
+                    bat "${env.PYTHON_PATH}\\Scripts\\pip.exe install -r requirements.txt"
                 }
             }
         }
@@ -19,7 +30,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    bat 'C:\\Users\\tbarkman\\AppData\\Local\\Programs\\Python\\Python312\\python.exe -m unittest discover -s tests'
+                    bat "${env.PYTHON_PATH}\\python.exe -m unittest discover -s tests"
                 }
             }
         }
