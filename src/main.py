@@ -1,5 +1,5 @@
 from config_validator import ConfigValidator
-from src.app_config import AppConfig
+from app_config import AppConfig
 import git_service
 import s3_service
 

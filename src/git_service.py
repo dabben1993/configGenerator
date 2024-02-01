@@ -3,7 +3,7 @@ from git import Repo
 from git.exc import GitCommandError
 import structlog
 
-from src.service_exception import ServiceException
+from service_exception import ServiceException
 
 
 class GitService:
