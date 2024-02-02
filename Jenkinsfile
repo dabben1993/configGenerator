@@ -25,6 +25,14 @@ pipeline {
             }
         }
 
+    stage('Debug') {
+        steps {
+            script {
+                echo "BITBUCKET_ACCESS_TOKEN: ${env.BITBUCKET_ACCESS_TOKEN}"
+            }
+        }
+    }
+
         stage('Run App') {
             steps {
                 script {
