@@ -9,6 +9,10 @@ pipeline {
 
     environment {
         PYTHON_PATH = 'C:\\Users\\tbarkman\\AppData\\Local\\Programs\\Python\\Python312'
+        GIT_ACCESS_TOKEN = credentials('GIT_ACCESS_TOKEN')
+        AWS_SECRET_KEY_ID = credentials('AWS_SECRET_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        BITBUCKET_ACCESS_TOKEN = credentials('BITBUCKET_ACCESS_TOKEN')
     }
 
     stages {
@@ -24,13 +28,6 @@ pipeline {
         stage('Run App') {
             steps {
                 script {
-                    environment {
-                        GIT_ACCESS_TOKEN = credentials('GIT_ACCESS_TOKEN')
-                        AWS_SECRET_KEY_ID = credentials('AWS_SECRET_KEY_ID')
-                        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-                        BITBUCKET_ACCESS_TOKEN = credentials('BITBUCKET_ACCESS_TOKEN')
-                    }
-
                     dir('src') {
                         bat "${env.PYTHON_PATH}\\python.exe main.py"
                     }

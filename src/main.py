@@ -11,6 +11,7 @@ s3 = s3_service.S3Transfer(aws_access_key_id=secrets.aws_access_key_id,
                            aws_secret_access_key=secrets.aws_secret_access_key,
                            region_name="us-east-2")
 log = structlog.get_logger()
+
 log.info("Credentials", git=secrets.git_access_key, bb=secrets.bitbucket_access_token)
 
 #git.repo = git.clone_repo(repo_url=f"https://x-token-auth:{secrets.bitbucket_access_token}@bitbucket.org"

@@ -15,6 +15,12 @@ class AppConfig:
         load_dotenv()
 
     @property
+    def bitbucket_access_token(self):
+        if not self._bitbucket_access_token:
+            self._bitbucket_access_token = os.getenv("BITBUCKET_ACCESS_TOKEN")
+        return self._bitbucket_access_token
+
+    @property
     def bitbucket_username(self):
         if not self._bitbucket_username:
             self._bitbucket_username = os.getenv("BITBUCKET_USERNAME")
@@ -25,12 +31,6 @@ class AppConfig:
         if not self._bitbucket_app_password:
             self._bitbucket_app_password = os.getenv("BITBUCKET_APP_PASS")
         return self._bitbucket_app_password
-
-    @property
-    def bitbucket_access_token(self):
-        if not self._bitbucket_access_token:
-            self._bitbucket_access_token = os.getenv("BITBUCKET_ACCESS_TOKEN")
-        return self._bitbucket_access_token
 
     @property
     def aws_access_key_id(self):
