@@ -11,7 +11,14 @@ class AppConfig:
         self._aws_access_key_id = None
         self._aws_secret_access_key = None
         self._git_access_key = None
+        self._bitbucket_access_token = None
         load_dotenv()
+
+    @property
+    def bitbucket_access_token(self):
+        if not self._bitbucket_access_token:
+            self._bitbucket_access_token = os.getenv("BITBUCKET_ACCESS_TOKEN")
+        return self._bitbucket_access_token
 
     @property
     def bitbucket_username(self):

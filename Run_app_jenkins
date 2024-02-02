@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     options {
+        // Set the working dir for the entire pipeline
         buildDiscarder(logRotator(artifactNumToKeepStr: '1', numToKeepStr: '5'))
         disableConcurrentBuilds()
         timestamps()
@@ -9,13 +10,14 @@ pipeline {
 
     environment {
         PYTHON_PATH = 'C:\\Users\\tbarkman\\AppData\\Local\\Programs\\Python\\Python312'
-        GIT_ACCESS_TOKEN = credentials('GIT_ACCESS_TOKEN')
-        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
-        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-        BITBUCKET_ACCESS_TOKEN = credentials('BITBUCKET_ACCESS_TOKEN')
     }
 
     stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
 
         stage('Setup') {
             steps {
@@ -25,20 +27,10 @@ pipeline {
             }
         }
 
-    stage('Debug') {
-        steps {
-            script {
-                echo "BITBUCKET_ACCESS_TOKEN: ${env.BITBUCKET_ACCESS_TOKEN}"
-            }
-        }
-    }
-
-        stage('Run App') {
+        stage('Test') {
             steps {
                 script {
-                    dir('src') {
-                        bat "${env.PYTHON_PATH}\\python.exe main.py"
-                    }
+                    bat "${env.PYTHON_PATH}\\python.exe -m unittest discover -s tests"
                 }
             }
         }

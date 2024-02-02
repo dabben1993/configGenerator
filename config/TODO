@@ -40,5 +40,7 @@ Documentation
     git_service
     s3_service
 
+Change push changes to a bitbucket service with credentials
+
 make jenkins pipeline to run unit tests
 

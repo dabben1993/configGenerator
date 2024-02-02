@@ -3,7 +3,7 @@ from git import Repo
 from git.exc import GitCommandError
 import structlog
 
-from src.service_exception import ServiceException
+from service_exception import ServiceException
 
 
 class GitService:
@@ -46,7 +46,8 @@ class GitService:
             raise ServiceException("Error updating existing repository",
                                    original_exception=str(git_error))
 
-    def clone_repo(self, repo_url, destination, branch):
+    def clone_repo(self, repo_url, destination, branch, secret):
+        self.log.info("creds", git=self.pat, bb=secret)
         try:
             repo_name = self._get_repo_name(repo_url)
             destination = os.path.join(destination, repo_name)
@@ -105,7 +106,7 @@ class GitService:
             raise ServiceException("Error committing changes",
                                    original_exception=e)
 
-    def push_changes(self):
+    def push_changes(self, bitbucket_access_token):
         try:
             origin = self.repo.remote(name='origin')
             origin.push(refspec=f'{self.repo.active_branch.name}:{self.repo.active_branch.name}')
@@ -119,12 +120,11 @@ class GitService:
         self.repo.delete_head(branch_name, force=True)
         self.log.info("Branch deleted", branch=branch_name)
 
-
-    def create_and_push_to_new_branch(self, new_branch_name, commit_message):
+    def create_and_push_to_new_branch(self, new_branch_name, commit_message, bitbucket_access_key):
         try:
             self.checkout_new_branch(branch_name=new_branch_name)
             self.commit_changes(commit_message=commit_message)
-            self.push_changes()
+            self.push_changes(bitbucket_access_key)
 
         except ServiceException as e:
             self.log.warning("Error creating or pushing changes to the new file", error={e})
