@@ -28,6 +28,8 @@ pipeline {
                         GIT_ACCESS_TOKEN = credentials('GIT_ACCESS_TOKEN')
                         AWS_SECRET_KEY_ID = credentials('AWS_SECRET_KEY_ID')
                         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+                        BITBUCKET_USERNAME = credentials('BITBUCKET_USERNAME')
+                        BITBUCKET_APP_PASS = credentials('BITBUCKET_APP_PASS')
                     }
 
                     dir('src') {
