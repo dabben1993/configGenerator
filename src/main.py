@@ -31,7 +31,7 @@ git.create_and_push_to_new_branch(new_branch_name=branch_name,
 
 
 s3.upload_folder(local_folder_path=git.repo.working_dir + "/output/",
-                         bucket_name="timpabucket", s3_prefix="final/")
+                         bucket_name="timpabucket", s3_prefix="jenkins-test/")
 git.switch_branch("main")
 git.delete_local_branch(branch_name)
 
