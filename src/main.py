@@ -25,7 +25,9 @@ git.list_remote_branches()
 
 
 git.create_and_push_to_new_branch(new_branch_name=branch_name,
-                                  commit_message="this is commit 215332")
+                                  commit_message="this is commit 215332",
+                                  bitbucket_username=secrets.bitbucket_username,
+                                  bitbucket_password=secrets.bitbucket_app_password)
 
 
 s3.upload_folder(local_folder_path=git.repo.working_dir + "/output/",
