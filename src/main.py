@@ -4,7 +4,7 @@ import git_service
 import s3_service
 
 secrets = AppConfig()
-branch_name = "jenkins_test04"
+branch_name = "jenkins_test05"
 git = git_service.GitService(pat=secrets.git_access_key)
 s3 = s3_service.S3Transfer(aws_access_key_id=secrets.aws_access_key_id,
                            aws_secret_access_key=secrets.aws_secret_access_key,
