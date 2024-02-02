@@ -109,7 +109,6 @@ class GitService:
     def push_changes(self, bitbucket_access_token):
         try:
             origin = self.repo.remote(name='origin')
-            self.log.info("url", url=origin.url)
             origin.push(refspec=f'{self.repo.active_branch.name}:{self.repo.active_branch.name}')
             self.log.info("Changes pushed", pushed_to_branch=self.repo.active_branch.name)
         except GitCommandError as e:
