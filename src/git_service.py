@@ -105,11 +105,10 @@ class GitService:
             raise ServiceException("Error committing changes",
                                    original_exception=e)
 
-    def push_changes(self, bitbucket_username, bitbucket_password):
+    def push_changes(self, bitbucket_access_token):
         try:
             origin = self.repo.remote(name='origin')
-            origin.push(refspec=f'{self.repo.active_branch.name}:{self.repo.active_branch.name}',
-                        auth=(bitbucket_username, bitbucket_password))
+            origin.push(refspec=f'{self.repo.active_branch.name}:{self.repo.active_branch.name}')
             self.log.info("Changes pushed", pushed_to_branch=self.repo.active_branch.name)
         except GitCommandError as e:
             self.log.warning("Error pushing changes to the remote repository", error=str(e))
@@ -120,11 +119,11 @@ class GitService:
         self.repo.delete_head(branch_name, force=True)
         self.log.info("Branch deleted", branch=branch_name)
 
-    def create_and_push_to_new_branch(self, new_branch_name, commit_message, bitbucket_username, bitbucket_password):
+    def create_and_push_to_new_branch(self, new_branch_name, commit_message, bitbucket_access_key):
         try:
             self.checkout_new_branch(branch_name=new_branch_name)
             self.commit_changes(commit_message=commit_message)
-            self.push_changes(bitbucket_username, bitbucket_password)
+            self.push_changes(bitbucket_access_key)
 
         except ServiceException as e:
             self.log.warning("Error creating or pushing changes to the new file", error={e})

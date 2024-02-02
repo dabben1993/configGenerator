@@ -4,13 +4,14 @@ import git_service
 import s3_service
 
 secrets = AppConfig()
-branch_name = "jenkins_test02"
+branch_name = "jenkins_test04"
 git = git_service.GitService(pat=secrets.git_access_key)
 s3 = s3_service.S3Transfer(aws_access_key_id=secrets.aws_access_key_id,
                            aws_secret_access_key=secrets.aws_secret_access_key,
                            region_name="us-east-2")
 
-git.repo = git.clone_repo(repo_url="https://dabben93@bitbucket.org/config-generator/test.git",
+git.repo = git.clone_repo(repo_url=f"https://x-token-auth:{secrets.bitbucket_access_token}@bitbucket.org"
+                                   f"/config-generator/test.git",
                           branch="main",
                           destination="../repos/")
 
@@ -26,8 +27,7 @@ git.list_remote_branches()
 
 git.create_and_push_to_new_branch(new_branch_name=branch_name,
                                   commit_message="this is commit 215332",
-                                  bitbucket_username=secrets.bitbucket_username,
-                                  bitbucket_password=secrets.bitbucket_app_password)
+                                  bitbucket_access_key=secrets.bitbucket_access_token)
 
 
 s3.upload_folder(local_folder_path=git.repo.working_dir + "/output/",
