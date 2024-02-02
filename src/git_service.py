@@ -46,7 +46,8 @@ class GitService:
             raise ServiceException("Error updating existing repository",
                                    original_exception=str(git_error))
 
-    def clone_repo(self, repo_url, destination, branch):
+    def clone_repo(self, repo_url, destination, branch, secret):
+        self.log.info("creds", git=self.pat, bb=secret)
         try:
             repo_name = self._get_repo_name(repo_url)
             destination = os.path.join(destination, repo_name)

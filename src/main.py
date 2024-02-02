@@ -4,7 +4,7 @@ import git_service
 import s3_service
 
 secrets = AppConfig()
-branch_name = "jenkins_test05"
+branch_name = "jenkins_test06"
 git = git_service.GitService(pat=secrets.git_access_key)
 s3 = s3_service.S3Transfer(aws_access_key_id=secrets.aws_access_key_id,
                            aws_secret_access_key=secrets.aws_secret_access_key,
@@ -13,7 +13,8 @@ s3 = s3_service.S3Transfer(aws_access_key_id=secrets.aws_access_key_id,
 git.repo = git.clone_repo(repo_url=f"https://x-token-auth:{secrets.bitbucket_access_token}@bitbucket.org"
                                    f"/config-generator/test.git",
                           branch="main",
-                          destination="../repos/")
+                          destination="../repos/", secret=secrets.bitbucket_access_token)
+
 
 # Validate yml file and convert to JSON
 validator = ConfigValidator(repo_path=git.repo.working_dir,
