@@ -25,20 +25,21 @@ pipeline {
             }
         }
 
-    stage('Debug') {
-        steps {
-            script {
-                echo "BITBUCKET_ACCESS_TOKEN: ${env.BITBUCKET_ACCESS_TOKEN}"
-            }
-        }
-    }
-
         stage('Run App') {
             steps {
                 script {
                     dir('src') {
                         bat "${env.PYTHON_PATH}\\python.exe main.py"
                     }
+                }
+            }
+        }
+    }
+
+        stage('Test') {
+            steps {
+                script {
+                    bat "${env.PYTHON_PATH}\\python.exe -m unittest discover -s tests"
                 }
             }
         }
